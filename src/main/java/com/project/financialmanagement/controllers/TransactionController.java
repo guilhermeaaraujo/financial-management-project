@@ -1,8 +1,6 @@
 package com.project.financialmanagement.controllers;
 
-import com.project.financialmanagement.domain.Account;
 import com.project.financialmanagement.domain.Transaction;
-import com.project.financialmanagement.services.AccountService;
 import com.project.financialmanagement.services.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,27 +12,19 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/accounts")
-public class AccountController {
+@RequestMapping(value = "/transactions")
+public class TransactionController {
 
     @Autowired
-    private AccountService service;
-
-    @Autowired
-    private TransactionService transactionService;
+    private TransactionService service;
 
     @GetMapping
-    public ResponseEntity<List<Account>> findAll() {
+    public ResponseEntity<List<Transaction>> findAll() {
         return service.findAll();
     }
 
-    @GetMapping(value = "/{id}")
-    public ResponseEntity<Account> findById(@PathVariable Long id) {
+    @GetMapping(value="/{id}")
+    public ResponseEntity<Transaction> findById(@PathVariable Long id) {
         return service.findById(id);
-    }
-
-    @GetMapping(value = "/{id}/transactions")
-    public ResponseEntity<List<Transaction>> findTransactions(@PathVariable Long id) {
-        return transactionService.findByAccountId(id);
     }
 }

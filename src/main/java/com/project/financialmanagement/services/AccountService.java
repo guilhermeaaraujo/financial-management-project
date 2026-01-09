@@ -25,6 +25,11 @@ public class AccountService {
         return ResponseEntity.ok().body(list);
     }
 
+    public ResponseEntity<Account> findById(Long id) {
+        Optional<Account> account = repository.findById(id);
+        return ResponseEntity.ok().body(account.get());
+    }
+
     public ResponseEntity<List<Account>> findByUserId(Long userId) {
         Optional<User> user = userRepository.findById(userId);
         List<Account> accounts = repository.findByUserId(user.get().getId());
