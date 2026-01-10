@@ -2,11 +2,13 @@ package com.project.financialmanagement.services;
 
 import com.project.financialmanagement.domain.Account;
 import com.project.financialmanagement.domain.Transaction;
-import com.project.financialmanagement.domain.User;
 import com.project.financialmanagement.repositories.AccountRepository;
 import com.project.financialmanagement.repositories.TransactionRepository;
+import com.project.financialmanagement.services.exceptions.DatabaseException;
+import com.project.financialmanagement.services.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,19 +23,30 @@ public class TransactionService {
     @Autowired
     private AccountRepository accountRepository;
 
-    public ResponseEntity<List<Transaction>> findAll() {
-        List<Transaction> list = repository.findAll();
-        return ResponseEntity.ok().body(list);
+    public List<Transaction> findAll() {
+        return repository.findAll();
     }
 
-    public ResponseEntity<Transaction> findById(Long id) {
-        Optional<Transaction> Transaction = repository.findById(id);
-        return ResponseEntity.ok().body(Transaction.get());
+    public Transaction findById(Long id) {
+        Optional<Transaction> transaction = repository.findById(id);
+        return transaction.orElseThrow(() -> new ResourceNotFoundException(id));
     }
 
-    public ResponseEntity<List<Transaction>> findByAccountId(Long accountId) {
-        Optional<Account> account = accountRepository.findById(accountId);
-        List<Transaction> transactions = repository.findByAccountId(account.get().getId());
-        return ResponseEntity.ok().body(transactions);
+    public List<Transaction> findByAccountId(Long accountId) {
+        Account account = accountRepository.findById(accountId).orElseThrow(() -> new ResourceNotFoundException(accountId));
+        List<Transaction> list = repository.findByAccountId(account.getId());
+        return list;
+    }
+
+    public Transaction insert(Transaction transaction) {
+        return repository.save(transaction);
+    }
+
+    public void delete(Long id) {
+        try {
+            repository.deleteById(id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new ResourceNotFoundException(id);
+        }
     }
 }

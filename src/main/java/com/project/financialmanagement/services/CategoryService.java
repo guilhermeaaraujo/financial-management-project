@@ -2,6 +2,7 @@ package com.project.financialmanagement.services;
 
 import com.project.financialmanagement.domain.Category;
 import com.project.financialmanagement.repositories.CategoryRepository;
+import com.project.financialmanagement.services.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -15,13 +16,16 @@ public class CategoryService {
     @Autowired
     private CategoryRepository repository;
 
-    public ResponseEntity<List<Category>> findAll() {
-        List<Category> list = repository.findAll();
-        return ResponseEntity.ok().body(list);
+    public List<Category> findAll() {
+        return repository.findAll();
     }
 
-    public ResponseEntity<Category> findById(Long id) {
-        Optional<Category> Category = repository.findById(id);
-        return ResponseEntity.ok().body(Category.get());
+    public Category findById(Long id) {
+        Optional<Category> category = repository.findById(id);
+        return category.orElseThrow(() -> new ResourceNotFoundException(id));
+    }
+
+    public Category insert(Category category) {
+        return repository.save(category);
     }
 }

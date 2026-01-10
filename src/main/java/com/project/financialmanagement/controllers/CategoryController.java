@@ -5,11 +5,10 @@ import com.project.financialmanagement.domain.User;
 import com.project.financialmanagement.services.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -21,11 +20,22 @@ public class CategoryController {
 
     @GetMapping
     public ResponseEntity<List<Category>> findAll() {
-        return service.findAll();
+        List<Category> list = service.findAll();
+        return ResponseEntity.ok().body(list);
     }
 
     @GetMapping(value="/{id}")
     public ResponseEntity<Category> findById(@PathVariable Long id) {
-        return service.findById(id);
+        Category category = service.findById(id);
+        return ResponseEntity.ok().body(category);
     }
+
+    @PostMapping
+    public ResponseEntity<Category> insert(@RequestBody Category category) {
+        category = service.insert(category);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(category).toUri();
+        return ResponseEntity.created(uri).body(category);
+    }
+
+    // Sem métodos update e delete pq não há necessidade nessa entidade.
 }

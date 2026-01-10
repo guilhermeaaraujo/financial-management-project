@@ -6,11 +6,10 @@ import com.project.financialmanagement.services.AccountService;
 import com.project.financialmanagement.services.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -25,16 +24,38 @@ public class AccountController {
 
     @GetMapping
     public ResponseEntity<List<Account>> findAll() {
-        return service.findAll();
+        List<Account> list = service.findAll();
+        return ResponseEntity.ok().body(list);
     }
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<Account> findById(@PathVariable Long id) {
-        return service.findById(id);
+        Account account = service.findById(id);
+        return ResponseEntity.ok().body(account);
     }
 
     @GetMapping(value = "/{id}/transactions")
     public ResponseEntity<List<Transaction>> findTransactions(@PathVariable Long id) {
-        return transactionService.findByAccountId(id);
+        List<Transaction> list = transactionService.findByAccountId(id);
+        return ResponseEntity.ok().body(list);
+    }
+
+    @PostMapping
+    public ResponseEntity<Account> insert(@RequestBody Account account) {
+        account = service.insert(account);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(account.getId()).toUri();
+        return ResponseEntity.created(uri).body(account);
+    }
+
+    @DeleteMapping(value="/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        service.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<Account> update(@PathVariable Long id, @RequestBody Account account) {
+        account = service.update(id, account);
+        return ResponseEntity.ok().body(account);
     }
 }

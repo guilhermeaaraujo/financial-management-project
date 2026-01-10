@@ -36,7 +36,8 @@ public class UserController {
 
     @GetMapping(value = "/{id}/accounts")
     public ResponseEntity<List<Account>> findAccounts(@PathVariable Long id) {
-        return accountService.findByUserId(id);
+        List<Account> accounts = accountService.findByUserId(id);
+        return ResponseEntity.ok().body(accounts);
     }
 
     @PostMapping
