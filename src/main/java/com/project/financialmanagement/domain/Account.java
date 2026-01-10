@@ -94,4 +94,12 @@ public class Account implements Serializable {
     public int hashCode() {
         return Objects.hashCode(id);
     }
+
+    public void increaseBalance(Double value) {
+        balance += value;
+    }
+
+    public void decreaseBalance(Double value) {
+        balance -= value;
+    }
 }

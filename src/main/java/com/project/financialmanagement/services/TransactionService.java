@@ -2,6 +2,7 @@ package com.project.financialmanagement.services;
 
 import com.project.financialmanagement.domain.Account;
 import com.project.financialmanagement.domain.Transaction;
+import com.project.financialmanagement.domain.enums.OperationType;
 import com.project.financialmanagement.repositories.AccountRepository;
 import com.project.financialmanagement.repositories.TransactionRepository;
 import com.project.financialmanagement.services.exceptions.DatabaseException;
@@ -39,6 +40,19 @@ public class TransactionService {
     }
 
     public Transaction insert(Transaction transaction) {
+        Long accountId = transaction.getAccount().getId();
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new ResourceNotFoundException(accountId));
+        OperationType type = transaction.getCategory().getOperationType();
+
+        // Regra de negócio: Toda nova transação altera o saldo da conta.
+        if (type == OperationType.INCOME) {
+            account.increaseBalance(transaction.getValue());
+        } else {
+            account.decreaseBalance(transaction.getValue());
+        }
+
+        accountRepository.save(account);
         return repository.save(transaction);
     }
 
