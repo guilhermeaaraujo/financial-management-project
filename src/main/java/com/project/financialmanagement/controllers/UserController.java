@@ -24,12 +24,14 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<List<User>> findAll() {
-        return userService.findAll();
+        List<User> list = userService.findAll();
+        return ResponseEntity.ok().body(list);
     }
 
     @GetMapping(value="/{id}")
     public ResponseEntity<User> findById(@PathVariable Long id) {
-        return userService.findById(id);
+        User user = userService.findById(id);
+        return ResponseEntity.ok().body(user);
     }
 
     @GetMapping(value = "/{id}/accounts")
