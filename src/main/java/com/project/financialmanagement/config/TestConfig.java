@@ -35,6 +35,11 @@ public class TestConfig implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
+        transactionRepository.deleteAll();
+        accountRepository.deleteAll();
+        categoryRepository.deleteAll();
+        userRepository.deleteAll();
+
         User u1 = new User(null, "João", "joao@gmail.com");
         User u2 = new User(null, "Maria", "maria@gmail.com");
 
