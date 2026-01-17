@@ -1,13 +1,13 @@
 package com.guilherme.financialmanagement.controllers;
 
 import com.guilherme.financialmanagement.domain.User;
-import com.guilherme.financialmanagement.domain.UserDTO;
+import com.guilherme.financialmanagement.domain.dto.UserDTO;
 import com.guilherme.financialmanagement.services.UserService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -19,6 +19,9 @@ public class UserController {
 
     @Autowired
     private UserService service;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
@@ -44,6 +47,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<UserDTO> insert(@RequestBody User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         service.insert(user);
         UserDTO userDTO = new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getRole());
         return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
@@ -59,6 +63,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<UserDTO> update(@PathVariable Long id, @RequestBody User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         service.update(id, user);
         UserDTO userDTO = new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getRole());
         return ResponseEntity.ok().body(userDTO);

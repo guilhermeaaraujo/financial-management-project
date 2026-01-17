@@ -1,4 +1,4 @@
-package com.guilherme.financialmanagement.domain;
+package com.guilherme.financialmanagement.domain.dto;
 
 import com.guilherme.financialmanagement.domain.enums.UserRole;
 
