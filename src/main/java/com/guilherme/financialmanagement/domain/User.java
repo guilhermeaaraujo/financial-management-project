@@ -75,6 +75,10 @@ public class User implements UserDetails {
         this.role = role;
     }
 
+    public List<Account> getAccounts() {
+        return accounts;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
