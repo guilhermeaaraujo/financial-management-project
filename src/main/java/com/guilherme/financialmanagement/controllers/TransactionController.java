@@ -41,7 +41,8 @@ public class TransactionController {
         return ResponseEntity.ok().body(transactionDTO);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    // Usuários podem inserir transações em suas próprias contas.
+    @PreAuthorize("hasRole('USER')")
     @PostMapping
     public ResponseEntity<TransactionDTO> insert(@RequestBody Transaction transaction) {
         service.insert(transaction);
@@ -49,7 +50,8 @@ public class TransactionController {
         return ResponseEntity.status(HttpStatus.CREATED).body(transactionDTO);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    // Usuários podem deletar transações de suas contas.
+    @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);

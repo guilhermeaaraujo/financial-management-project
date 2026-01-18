@@ -44,7 +44,8 @@ public class AccountController {
         return ResponseEntity.ok().body(accountDTO);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    // Usuários podem criar contas para si mesmos.
+    @PreAuthorize("hasRole('USER')")
     @PostMapping
     public ResponseEntity<AccountDTO> insert(@RequestBody Account account) {
         service.insert(account);
@@ -54,7 +55,8 @@ public class AccountController {
         return ResponseEntity.status(HttpStatus.CREATED).body(accountDTO);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    // Usuários podem deletar suas próprias contas.
+    @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);

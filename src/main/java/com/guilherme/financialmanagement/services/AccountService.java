@@ -1,13 +1,17 @@
 package com.guilherme.financialmanagement.services;
 
 import com.guilherme.financialmanagement.domain.Account;
+import com.guilherme.financialmanagement.domain.User;
 import com.guilherme.financialmanagement.repositories.AccountRepository;
 import com.guilherme.financialmanagement.services.exceptions.DatabaseException;
+import com.guilherme.financialmanagement.services.exceptions.ForbiddenOperationException;
 import com.guilherme.financialmanagement.services.exceptions.ResourceNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,12 +33,25 @@ public class AccountService {
         );
     }
 
-    public Account insert(Account Account) {
-        return accountRepository.save(Account);
+    // Regra de negócio: Usuários podem criar contas para si mesmos.
+    public Account insert(Account account) {
+        User authenticadedUser = getAuthenticadedUser();
+        if (!account.getUser().getId().equals(authenticadedUser.getId())) {
+            throw new ForbiddenOperationException("You cannot create an account for another user!");
+        }
+        return accountRepository.save(account);
     }
 
+    // Regra de negócio: Usuários podem deletar suas próprias contas.
     public void delete(Long id) {
         try {
+            Account account = accountRepository.findById(id)
+                    .orElseThrow(
+                            () -> new ResourceNotFoundException(id));
+            User authenticadedUser = getAuthenticadedUser();
+            if (!account.getUser().getId().equals(authenticadedUser.getId())) {
+                throw new ForbiddenOperationException("You cannot delete an account that belongs to another user!");
+            }
             accountRepository.deleteById(id);
         } catch (EmptyResultDataAccessException e) {
             throw new ResourceNotFoundException(id);
@@ -52,5 +69,10 @@ public class AccountService {
         } catch (EntityNotFoundException e) {
             throw new ResourceNotFoundException(id);
         }
+    }
+
+    public User getAuthenticadedUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return (User) auth.getPrincipal();
     }
 }

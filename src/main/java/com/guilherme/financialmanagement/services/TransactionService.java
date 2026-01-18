@@ -4,16 +4,20 @@ package com.guilherme.financialmanagement.services;
 import com.guilherme.financialmanagement.domain.Account;
 import com.guilherme.financialmanagement.domain.Category;
 import com.guilherme.financialmanagement.domain.Transaction;
+import com.guilherme.financialmanagement.domain.User;
 import com.guilherme.financialmanagement.domain.enums.CategoryType;
 import com.guilherme.financialmanagement.repositories.AccountRepository;
 import com.guilherme.financialmanagement.repositories.CategoryRepository;
 import com.guilherme.financialmanagement.repositories.TransactionRepository;
 import com.guilherme.financialmanagement.services.exceptions.DatabaseException;
+import com.guilherme.financialmanagement.services.exceptions.ForbiddenOperationException;
 import com.guilherme.financialmanagement.services.exceptions.ResourceNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -42,12 +46,19 @@ public class TransactionService {
         );
     }
 
+    // Regra de negócio: Usuários podem inserir transações somente em suas próprias contas!
     public Transaction insert(Transaction transaction) {
         Long accountId = transaction.getAccount().getId();
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(
                         () -> new ResourceNotFoundException(accountId)
                 );
+
+        User authenticadedUser = getAuthenticadedUser();
+
+        if (!account.getUser().getId().equals(authenticadedUser.getId())) {
+            throw new ForbiddenOperationException("You cannot add transactions in an account that does not belong to you!");
+        }
 
         Category category = categoryRepository.getReferenceById(transaction.getCategory().getId());
         if (category.getType() == CategoryType.EXPENSE) {
@@ -59,8 +70,21 @@ public class TransactionService {
         return transactionRepository.save(transaction);
     }
 
+    // Regra de negócio: Usuários podem deletar transações somente em suas próprias contas!
     public void delete(Long id) {
         try {
+            Transaction transaction = transactionRepository.getReferenceById(id);
+            Long accountId = transaction.getAccount().getId();
+            Account account = accountRepository.findById(accountId)
+                    .orElseThrow(
+                            () -> new ResourceNotFoundException(accountId)
+                    );
+
+            User authenticadedUser = getAuthenticadedUser();
+
+            if (!account.getUser().getId().equals(authenticadedUser.getId())) {
+                throw new ForbiddenOperationException("You cannot delete transactions in an account that does not belong to you!");
+            }
             transactionRepository.deleteById(id);
         } catch (EmptyResultDataAccessException e) {
             throw new ResourceNotFoundException(id);
@@ -79,5 +103,10 @@ public class TransactionService {
         } catch (EntityNotFoundException e) {
             throw new ResourceNotFoundException(id);
         }
+    }
+
+    public User getAuthenticadedUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return (User) auth.getPrincipal();
     }
 }
