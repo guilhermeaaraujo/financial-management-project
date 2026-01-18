@@ -1,8 +1,11 @@
 package com.guilherme.financialmanagement.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.guilherme.financialmanagement.domain.enums.CategoryType;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -17,6 +20,10 @@ public class Category {
 
     @Enumerated(EnumType.STRING)
     private CategoryType type;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "category")
+    private List<Transaction> transactions = new ArrayList<>();
 
     public Category() {
     }
@@ -48,6 +55,10 @@ public class Category {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public List<Transaction> getTransactions() {
+        return transactions;
     }
 
     @Override

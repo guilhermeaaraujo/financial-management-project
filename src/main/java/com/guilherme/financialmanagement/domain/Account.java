@@ -3,6 +3,8 @@ package com.guilherme.financialmanagement.domain;
 import com.guilherme.financialmanagement.domain.enums.AccountType;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -22,6 +24,9 @@ public class Account {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(mappedBy = "account")
+    private List<Transaction> transactions = new ArrayList<>();
 
     public Account() {
     }
@@ -71,6 +76,18 @@ public class Account {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public List<Transaction> getTransactions() {
+        return transactions;
+    }
+
+    public void increaseBalance(Double value) {
+        balance += value;
+    }
+
+    public void decreaseBalance(Double value) {
+        balance -= value;
     }
 
     @Override
