@@ -8,6 +8,8 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,6 +29,11 @@ public class UserService {
                 .orElseThrow(
                         () -> new ResourceNotFoundException(id)
         );
+    }
+
+    public User findAuthenticadedUserDetails() {
+        User authenticadedUser = getAuthenticadedUser();
+        return authenticadedUser;
     }
 
     public User insert(User user) {
@@ -54,5 +61,10 @@ public class UserService {
         } catch (EntityNotFoundException e) {
             throw new ResourceNotFoundException(id);
         }
+    }
+
+    public User getAuthenticadedUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return (User) auth.getPrincipal();
     }
 }

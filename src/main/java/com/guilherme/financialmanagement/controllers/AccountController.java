@@ -1,7 +1,10 @@
 package com.guilherme.financialmanagement.controllers;
 
 import com.guilherme.financialmanagement.domain.Account;
+import com.guilherme.financialmanagement.domain.Transaction;
+import com.guilherme.financialmanagement.domain.User;
 import com.guilherme.financialmanagement.domain.dto.AccountDTO;
+import com.guilherme.financialmanagement.domain.dto.TransactionDTO;
 import com.guilherme.financialmanagement.domain.dto.UserDTO;
 import com.guilherme.financialmanagement.services.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +30,8 @@ public class AccountController {
         List<AccountDTO> accountsDTO = new ArrayList<>();
 
         for (Account a : accounts) {
-            UserDTO userDTO = new UserDTO(a.getUser().getId(), a.getUser().getName(),
-                    a.getUser().getEmail(), a.getUser().getRole());
-            accountsDTO.add(new AccountDTO(a.getId(), a.getName(), a.getBalance(), a.getType(), userDTO));
+            UserDTO userDTO = new UserDTO(a.getUser());
+            accountsDTO.add(new AccountDTO(a, userDTO));
         }
         return ResponseEntity.ok().body(accountsDTO);
     }
@@ -38,10 +40,35 @@ public class AccountController {
     @GetMapping("/{id}")
     public ResponseEntity<AccountDTO> findById(@PathVariable Long id) {
         Account account = service.findById(id);
-        UserDTO user = new UserDTO(account.getUser().getId(), account.getUser().getName(),
-                account.getUser().getEmail(), account.getUser().getRole());
-        AccountDTO accountDTO = new AccountDTO(account.getId(), account.getName(), account.getBalance(), account.getType(), user);
+        UserDTO user = new UserDTO(account.getUser());
+        AccountDTO accountDTO = new AccountDTO(account, user);
         return ResponseEntity.ok().body(accountDTO);
+    }
+
+    // Retorna as contas do usuário autenticado
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/myaccounts")
+    public ResponseEntity<List<AccountDTO>> findAuthenticadedUserAccounts() {
+        List<Account> accounts = service.findAuthenticadedUserAccounts();
+        List<AccountDTO> accountsDTO = new ArrayList<>();
+
+        for (Account a : accounts) {
+            accountsDTO.add(new AccountDTO(a, new UserDTO(a.getUser())));
+        }
+        return ResponseEntity.ok().body(accountsDTO);
+    }
+
+    // Retorna as transações de uma conta
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/{id}/transactions")
+    public ResponseEntity<List<TransactionDTO>> findAccountTransactions(@PathVariable Long id) {
+        List<Transaction> transactions = service.findAccountTransactions(id);
+        List<TransactionDTO> transactionsDTO = new ArrayList<>();
+
+        for (Transaction t : transactions) {
+            transactionsDTO.add(new TransactionDTO(t));
+        }
+        return ResponseEntity.ok().body(transactionsDTO);
     }
 
     // Usuários podem criar contas para si mesmos.
@@ -49,9 +76,8 @@ public class AccountController {
     @PostMapping
     public ResponseEntity<AccountDTO> insert(@RequestBody Account account) {
         service.insert(account);
-        UserDTO user = new UserDTO(account.getUser().getId(), account.getUser().getName(),
-                account.getUser().getEmail(), account.getUser().getRole());
-        AccountDTO accountDTO = new AccountDTO(account.getId(), account.getName(), account.getBalance(), account.getType(), user);
+        UserDTO user = new UserDTO(account.getUser());
+        AccountDTO accountDTO = new AccountDTO(account, user);
         return ResponseEntity.status(HttpStatus.CREATED).body(accountDTO);
     }
 
@@ -67,9 +93,8 @@ public class AccountController {
     @PutMapping("/{id}")
     public ResponseEntity<AccountDTO> update(@PathVariable Long id, @RequestBody Account account) {
         service.update(id, account);
-        UserDTO user = new UserDTO(account.getUser().getId(), account.getUser().getName(),
-                account.getUser().getEmail(), account.getUser().getRole());
-        AccountDTO accountDTO = new AccountDTO(account.getId(), account.getName(), account.getBalance(), account.getType(), user);
+        UserDTO user = new UserDTO(account.getUser());
+        AccountDTO accountDTO = new AccountDTO(account, user);
         return ResponseEntity.ok().body(accountDTO);
     }
 

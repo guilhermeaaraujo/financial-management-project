@@ -1,8 +1,10 @@
 package com.guilherme.financialmanagement.services;
 
 import com.guilherme.financialmanagement.domain.Account;
+import com.guilherme.financialmanagement.domain.Transaction;
 import com.guilherme.financialmanagement.domain.User;
 import com.guilherme.financialmanagement.repositories.AccountRepository;
+import com.guilherme.financialmanagement.repositories.TransactionRepository;
 import com.guilherme.financialmanagement.services.exceptions.DatabaseException;
 import com.guilherme.financialmanagement.services.exceptions.ForbiddenOperationException;
 import com.guilherme.financialmanagement.services.exceptions.ResourceNotFoundException;
@@ -22,6 +24,9 @@ public class AccountService {
     @Autowired
     private AccountRepository accountRepository;
 
+    @Autowired
+    private TransactionRepository transactionRepository;
+
     public List<Account> findAll() {
         return accountRepository.findAll();
     }
@@ -31,6 +36,21 @@ public class AccountService {
                 .orElseThrow(
                         () -> new ResourceNotFoundException(id)
         );
+    }
+
+    public List<Account> findAuthenticadedUserAccounts() {
+        User user = getAuthenticadedUser();
+        return accountRepository.findByUserId(user.getId());
+    }
+
+    // Regra de negócio: Usuários nao podem acessar transações de contas de outros usuários.
+    public List<Transaction> findAccountTransactions(Long id) {
+        Account account = accountRepository.getReferenceById(id);
+        User authenticadedUser = getAuthenticadedUser();
+        if (!account.getUser().getId().equals(authenticadedUser.getId())) {
+            throw new ForbiddenOperationException("You cannot access transactions of another user!");
+        }
+        return transactionRepository.findTransactionsByAccountId(id);
     }
 
     // Regra de negócio: Usuários podem criar contas para si mesmos.

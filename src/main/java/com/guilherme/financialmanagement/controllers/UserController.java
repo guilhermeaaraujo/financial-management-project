@@ -44,6 +44,15 @@ public class UserController {
         return ResponseEntity.ok().body(userDTO);
     }
 
+    // Retorna os dados do usuário autenticado.
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/me")
+    public ResponseEntity<UserDTO> findAuthenticadedUserDetails() {
+        User user = service.findAuthenticadedUserDetails();
+        UserDTO userDTO = new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getRole());
+        return ResponseEntity.ok().body(userDTO);
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<UserDTO> insert(@RequestBody User user) {

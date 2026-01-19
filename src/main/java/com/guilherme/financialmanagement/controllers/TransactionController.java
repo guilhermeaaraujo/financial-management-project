@@ -1,9 +1,7 @@
 package com.guilherme.financialmanagement.controllers;
 
 import com.guilherme.financialmanagement.domain.Transaction;
-import com.guilherme.financialmanagement.domain.TransactionDTO;
-import com.guilherme.financialmanagement.domain.dto.AccountDTO;
-import com.guilherme.financialmanagement.domain.dto.UserDTO;
+import com.guilherme.financialmanagement.domain.dto.TransactionDTO;
 import com.guilherme.financialmanagement.services.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
