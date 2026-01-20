@@ -22,14 +22,14 @@ public class CategoryController {
     @Autowired
     private CategoryService service;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER')")
     @GetMapping
     public ResponseEntity<List<Category>> findAll() {
         List<Category> categories = service.findAll();
         return ResponseEntity.ok().body(categories);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/{id}")
     public ResponseEntity<Category> findById(@PathVariable Long id) {
         Category category = service.findById(id);
