@@ -21,7 +21,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class TransactionService {
@@ -62,9 +61,9 @@ public class TransactionService {
 
         Category category = categoryRepository.getReferenceById(transaction.getCategory().getId());
         if (category.getType() == CategoryType.EXPENSE) {
-            account.decreaseBalance(transaction.getValue());
+            account.decreaseBalance(transaction.getAmount());
         } else {
-            account.increaseBalance(transaction.getValue());
+            account.increaseBalance(transaction.getAmount());
         }
 
         return transactionRepository.save(transaction);
@@ -96,9 +95,9 @@ public class TransactionService {
     public Transaction update(Long id, Transaction newTransaction) {
         try {
             Transaction transaction = transactionRepository.getReferenceById(id);
-            transaction.setDate(newTransaction.getDate());
+            transaction.setTransaction_date(newTransaction.getTransaction_date());
             transaction.setCategory(newTransaction.getCategory());
-            transaction.setValue(newTransaction.getValue());
+            transaction.setAmount(newTransaction.getAmount());
             return transactionRepository.save(transaction);
         } catch (EntityNotFoundException e) {
             throw new ResourceNotFoundException(id);

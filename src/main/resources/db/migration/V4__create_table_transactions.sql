@@ -1,7 +1,7 @@
 CREATE TABLE transactions (
     id SERIAL PRIMARY KEY,
-    value DECIMAL(15, 2),
-    date TIMESTAMP,
+    amount DECIMAL(15, 2),
+    transaction_date TIMESTAMP,
 
     account_id BIGINT NOT NULL,
     category_id BIGINT NOT NULL,

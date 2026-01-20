@@ -13,8 +13,8 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Double value;
-    private LocalDate date;
+    private Double amount;
+    private LocalDate transaction_date;
 
     @ManyToOne
     @JoinColumn(name = "account_id")
@@ -27,9 +27,9 @@ public class Transaction {
     public Transaction() {
     }
 
-    public Transaction(Double value, LocalDate date, Account account, Category category) {
-        this.value = value;
-        this.date = date;
+    public Transaction(Double amount, LocalDate transaction_date, Account account, Category category) {
+        this.amount = amount;
+        this.transaction_date = transaction_date;
         this.account = account;
         this.category = category;
     }
@@ -42,20 +42,20 @@ public class Transaction {
         this.id = id;
     }
 
-    public Double getValue() {
-        return value;
+    public Double getAmount() {
+        return amount;
     }
 
-    public void setValue(Double value) {
-        this.value = value;
+    public void setAmount(Double amount) {
+        this.amount = amount;
     }
 
-    public LocalDate getDate() {
-        return date;
+    public LocalDate getTransaction_date() {
+        return transaction_date;
     }
 
-    public void setDate(LocalDate date) {
-        this.date = date;
+    public void setTransaction_date(LocalDate transaction_date) {
+        this.transaction_date = transaction_date;
     }
 
     public Account getAccount() {

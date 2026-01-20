@@ -26,7 +26,7 @@ public class TransactionController {
         List<TransactionDTO> transactionsDTO = new ArrayList<>();
         
         for (Transaction t : transactions) {
-            transactionsDTO.add(new TransactionDTO(t.getId(), t.getValue(), t.getDate(), t.getAccount().getId(), t.getCategory()));
+            transactionsDTO.add(new TransactionDTO(t.getId(), t.getAmount(), t.getTransaction_date(), t.getAccount().getId(), t.getCategory()));
         }
         return ResponseEntity.ok().body(transactionsDTO);
     }
@@ -35,7 +35,7 @@ public class TransactionController {
     @GetMapping("/{id}")
     public ResponseEntity<TransactionDTO> findById(@PathVariable Long id) {
         Transaction transaction = service.findById(id);
-        TransactionDTO transactionDTO = new TransactionDTO(transaction.getId(), transaction.getValue(), transaction.getDate(), transaction.getAccount().getId(),transaction.getCategory());
+        TransactionDTO transactionDTO = new TransactionDTO(transaction.getId(), transaction.getAmount(), transaction.getTransaction_date(), transaction.getAccount().getId(),transaction.getCategory());
         return ResponseEntity.ok().body(transactionDTO);
     }
 
@@ -44,7 +44,7 @@ public class TransactionController {
     @PostMapping
     public ResponseEntity<TransactionDTO> insert(@RequestBody Transaction transaction) {
         service.insert(transaction);
-        TransactionDTO transactionDTO = new TransactionDTO(transaction.getId(), transaction.getValue(), transaction.getDate(), transaction.getAccount().getId(),transaction.getCategory());
+        TransactionDTO transactionDTO = new TransactionDTO(transaction.getId(), transaction.getAmount(), transaction.getTransaction_date(), transaction.getAccount().getId(),transaction.getCategory());
         return ResponseEntity.status(HttpStatus.CREATED).body(transactionDTO);
     }
 
@@ -60,7 +60,7 @@ public class TransactionController {
     @PutMapping("/{id}")
     public ResponseEntity<TransactionDTO> update(@PathVariable Long id, @RequestBody Transaction transaction) {
         service.update(id, transaction);
-        TransactionDTO transactionDTO = new TransactionDTO(transaction.getId(), transaction.getValue(), transaction.getDate(), transaction.getAccount().getId(),transaction.getCategory());
+        TransactionDTO transactionDTO = new TransactionDTO(transaction.getId(), transaction.getAmount(), transaction.getTransaction_date(), transaction.getAccount().getId(),transaction.getCategory());
         return ResponseEntity.ok().body(transactionDTO);
     }
 

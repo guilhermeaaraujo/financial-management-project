@@ -5,9 +5,9 @@ import com.guilherme.financialmanagement.domain.Transaction;
 
 import java.time.LocalDate;
 
-public record TransactionDTO(Long id, Double value, LocalDate date, Long accountId, Category category) {
+public record TransactionDTO(Long id, Double amount, LocalDate transaction_date, Long accountId, Category category) {
 
     public TransactionDTO(Transaction transaction) {
-        this(transaction.getId(), transaction.getValue(), transaction.getDate(), transaction.getAccount().getId(), transaction.getCategory());
+        this(transaction.getId(), transaction.getAmount(), transaction.getTransaction_date(), transaction.getAccount().getId(), transaction.getCategory());
     }
 }
