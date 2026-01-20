@@ -17,6 +17,8 @@ Este projeto foi desenvolvido como objeto de estudo para meu aprendizado no fram
 - Maven
 - REST API
 - Spring Security + JWT
+- H2 Database (Para testes)
+- JUnit + Mockito para testes unitários.
 
 ---
 
